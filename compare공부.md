@@ -21,9 +21,8 @@ def compare(x, y):
  - return 양수 : 나중에 들어온 요소가 앞으로 정렬됨(먼저들어온 요소보다 앞에 배치됨)
 
 ### Sorting에서의 활용
-from functools import cmp_to_key
-
-l = ['34', '37', '9', '31', '3']
+from functools import cmp_to_key   
+l = ['34', '37', '9', '31', '3']   
 return sorted(l, key=cmp_to_key(compare))
  - 이 결과는 ['9', '37', '34', '3', '31']이 return된다.
 
