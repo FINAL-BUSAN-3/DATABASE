@@ -1,0 +1,86 @@
+-- dw press raw data
+create table dw_mysql.datawarehouse.press_raw_data
+as select * from dl_iceberg.ods.ds_press;
+
+-- dw welding_raw_data
+create table dw_mysql.datawarehouse.welding_raw_data
+as select * from dl_iceberg.ods.ds_welding;
+
+-- ods naver news
+create table dl_iceberg.ods.ds_naver_news(
+  doc_id varchar COMMENT '문서 번호',
+  url varchar COMMENT '네이버 뉴스 링크',
+  section varchar COMMENT '분야',
+  crawl_dt varchar COMMENT '크롤링 시간',
+  media_com varchar COMMENT '언론사',
+  titile varchar COMMENT '기사제목',
+  contents varchar COMMENT '내용',
+  part_dt varchar COMMENT '일 파티션 키'
+);
+
+-- Mysql web
+CREATE TABLE model_info (
+    model_info_id VARCHAR(100) PRIMARY KEY,
+    model_name VARCHAR(50),
+    model_version INT,
+    python_version DECIMAL(3, 2),
+    library VARCHAR(50),
+    model_info VARCHAR(50),
+    deployment_date DATETIME,
+    loss DECIMAL(3, 2),
+    accuracy DECIMAL(3, 2),
+    model_info_file BLOB DEFAULT NULL
+);
+
+CREATE TABLE model_use (
+    model_use_id VARCHAR(100),
+    model_use_state BOOLEAN,
+    model_use_file BLOB DEFAULT NULL,
+    PRIMARY KEY (model_use_id),
+    CONSTRAINT fk_model_info
+        FOREIGN KEY (model_use_id) REFERENCES model_info(model_info_id)
+);
+-- Mysql web
+
+-- stg car_defects
+create external table if not exists stg.stg_car_defects(
+  defect_count string COMMENT '결함횟수',
+  defect_date string COMMENT  '결함날짜',
+  defect_distance string COMMENT '결함발생시 주행거리',
+  defect_speed string COMMENT '결함발생시 속도',
+  crawl_dt string COMMENT '크롤링 시간',
+  car_name string COMMENT  '차명',
+  car_type string COMMENT  '차종',
+  car_manufacturer string COMMENT '제작(수입)사',
+  car_year string COMMENT '모델연도',
+  car_transmission string COMMENT '변속기',
+  car_engine_capacity string COMMENT '엔진배기량',
+  car_fuel string COMMENT '사용연료',
+  defect_content  string COMMENT '결함내용'
+)
+row format delimited
+fields terminated by '\t'
+stored as textfile
+location 'hdfs:///hive/lake/stg.db/stg_car_defects'
+tblproperties ("skip.header.line.count"="1");
+
+-- ods car_defects
+CREATE TABLE dl_iceberg.ods.car_defects (
+  defect_count VARCHAR COMMENT '결함횟수',
+  defect_date VARCHAR COMMENT '결함날짜',
+  defect_distance VARCHAR COMMENT '결함발생시 주행거리',
+  defect_speed string COMMENT '결함발생시 속도',
+  crawl_dt VARCHAR COMMENT '크롤링 시간',
+  car_name VARCHAR COMMENT '차명',
+  car_type VARCHAR COMMENT '차종',
+  car_manufacturer VARCHAR COMMENT '제작(수입)사',
+  car_year VARCHAR COMMENT '모델연도',
+  car_transmission VARCHAR COMMENT '변속기',
+  car_engine_capacity VARCHAR COMMENT '엔진배기량',
+  car_fuel VARCHAR COMMENT '사용연료',
+  defect_content VARCHAR COMMENT '결함내용',
+  crawl_month VARCHAR COMMENT '크롤링 월 파티션 키'
+) WITH (
+  partitioning = ARRAY['crawl_month'],
+  sorted_by = ARRAY['car_name', 'defect_date']
+);
