@@ -1,4 +1,3 @@
--- ods naver news
 create table dl_iceberg.ods.ds_naver_news(
   doc_id varchar COMMENT '문서 번호',
   section varchar COMMENT '분야',
